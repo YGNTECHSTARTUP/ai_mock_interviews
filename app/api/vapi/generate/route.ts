@@ -25,12 +25,22 @@ export async function POST(request: Request) {
     `,
     });
 
+    let parsedQuestions = [];
+
+    try {
+      if (questions && questions.trim() !== "") {
+        parsedQuestions = JSON.parse(questions);
+      }
+    } catch (e) {
+      console.error("Failed to parse questions JSON:", e);
+    }
+
     const interview = {
       role: role,
       type: type,
       level: level,
       techstack: techstack.split(","),
-      questions: JSON.parse(questions),
+      questions: parsedQuestions,
       userId: userid,
       finalized: true,
       coverImage: getRandomInterviewCover(),
@@ -38,7 +48,7 @@ export async function POST(request: Request) {
     };
 
     await db.collection("interviews").add(interview);
-
+    // return Response.json(interview);
     return Response.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Error:", error);
